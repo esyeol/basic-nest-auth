@@ -8,13 +8,13 @@ export abstract class BaseModel {
   idx: number;
 
   @CreateDateColumn({
-    type: 'timestamp',
+    type: 'datetime',
     name: 'created_at',
   })
   createdAt: Date;
 
   @UpdateDateColumn({
-    type: 'timestamp',
+    type: 'datetime',
     name: 'updated_at',
   })
   updatedAt: Date;

@@ -25,9 +25,9 @@ export class UserModel extends BaseModel {
     length: 255,
     nullable: false,
     type: 'varchar',
-    name: 'user_password',
+    name: 'password',
   })
-  userPassword: string;
+  password: string;
 
   @IsString()
   @Length(2, 20)
@@ -73,6 +73,7 @@ export class UserModel extends BaseModel {
     type: 'boolean',
     name: 'privacy_aggrement',
     comment: '개인정보처리방침동의여부 0 -> false, 1 -> true',
+    default: false,
   })
   privacyAggrement: boolean;
 
