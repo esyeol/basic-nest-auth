@@ -1,7 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { CommonModule } from './common/common.module';
+import { CommonModule } from './domains/common/common.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 
 import {
@@ -10,13 +10,15 @@ import {
   ENV_DB_PASSWORD,
   ENV_DB_PORT,
   ENV_DB_USER,
-} from './common/const/env-keys.const';
+} from './domains/common/const/env-keys.const';
 import { LoggerMiddleware } from './middleware/logger.middleware';
+import { AuthModule } from './domains/auth/auth.module';
+import { UserModule } from './domains/user/user.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: ['.development.env'],
+      envFilePath: ['.development.env'], // 서비스 배포시 producet.env로 변경
       isGlobal: true,
     }),
     ThrottlerModule.forRoot([{ name: 'short', ttl: 1000, limit: 10 }]), // 초당 10번 이상의 요청 제외
@@ -31,6 +33,8 @@ import { LoggerMiddleware } from './middleware/logger.middleware';
       synchronize: true,
     }),
     CommonModule,
+    AuthModule,
+    UserModule,
   ],
   controllers: [],
   providers: [],
