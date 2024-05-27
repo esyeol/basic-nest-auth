@@ -32,4 +32,15 @@ export class UserService {
 
     return saveUser;
   }
+
+  /**
+   * User Id 조회
+   */
+  async getUserById(userId: string) {
+    return this.userRepository.findOne({
+      where: {
+        userId,
+      },
+    });
+  }
 }
