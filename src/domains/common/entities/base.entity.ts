@@ -4,7 +4,11 @@ import { CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'type
  * 공용으로 사용되는 추상클래스
  */
 export abstract class BaseModel {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({
+    comment: 'PK',
+    type: 'integer',
+    unsigned: true,
+  })
   idx: number;
 
   @CreateDateColumn({
