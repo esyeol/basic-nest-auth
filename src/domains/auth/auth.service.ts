@@ -3,7 +3,7 @@ import { UserService } from '../user/user.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { ENV_HASH_ROUND } from '../common/const/env-keys.const';
+import { ENV_HASH_ROUND, ENV_JWT_EXPOSE_ACCESS, ENV_JWT_EXPOSE_REFRESH } from '../common/const/env-keys.const';
 import { userDto } from '../user/dtos/user.dto';
 import { UserModel } from '../user/entities/user.entity';
 import { Payload } from '../user/security/payload-interface';
@@ -35,7 +35,11 @@ export class AuthService {
 
     console.log('payLoad ->', payLoad);
 
-    return this.jwtService.sign(payLoad);
+    return this.jwtService.sign(payLoad, {
+      expiresIn: isRefreshToken
+        ? this.configService.get<string>(ENV_JWT_EXPOSE_REFRESH)
+        : this.configService.get<string>(ENV_JWT_EXPOSE_ACCESS),
+    });
   }
 
   /**

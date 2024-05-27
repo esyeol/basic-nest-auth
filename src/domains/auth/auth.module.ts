@@ -4,7 +4,7 @@ import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from '../user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ENV_JWT_EXPORESIN, ENV_JWT_SECRETE } from '../common/const/env-keys.const';
+import { ENV_JWT_SECRETE } from '../common/const/env-keys.const';
 
 @Module({
   imports: [
@@ -13,9 +13,9 @@ import { ENV_JWT_EXPORESIN, ENV_JWT_SECRETE } from '../common/const/env-keys.con
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>(ENV_JWT_SECRETE),
-        signOptions: {
-          expiresIn: configService.get<string>(ENV_JWT_EXPORESIN),
-        },
+        // signOptions: {
+        //   expiresIn: configService.get<string>(ENV_JWT_EXPORESIN),
+        // },
       }),
       inject: [ConfigService],
     }),

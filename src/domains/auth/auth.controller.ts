@@ -15,6 +15,6 @@ export class AuthController {
   /** 코디용 로그인*/
   @Post('/login')
   async login(@Body() user: Pick<userDto, 'userId' | 'password'>) {
-    return this.authService.validateUser(user);
+    return await this.authService.validateUser(user);
   }
 }
