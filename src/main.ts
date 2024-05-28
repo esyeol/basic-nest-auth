@@ -3,13 +3,12 @@ declare const module: any;
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import * as csurf from 'csurf';
 import * as helmet from 'helmet';
 import * as hpp from 'hpp';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.use(csurf());
+  app.enableCors();
   app.use(hpp());
 
   app.use(helmet.hidePoweredBy());

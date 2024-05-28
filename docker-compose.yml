@@ -11,4 +11,5 @@ services:
       MARIADB_USER: maria
       MARIADB_PASSWORD: maria
       MARIADB_ROOT_PASSWORD: maria
-      
+      TZ: Asia/Seoul
+

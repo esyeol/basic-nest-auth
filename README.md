@@ -79,4 +79,3 @@ $ yarn start:hot # start development mode with hot reload module
 $ yarn build 
 $ yarn start:deploy # run pm2 ecosystem
 ```
-
