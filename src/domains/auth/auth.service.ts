@@ -94,6 +94,11 @@ export class AuthService {
   async validateUser(authUser: Pick<userDto, 'userId' | 'password'>) {
     // id, pwd 기반 검증 확인
     const existingUser: UserModel = await this.authenticateWithIdAndPassword(authUser);
-    return this.loginUser(existingUser);
+    // return this.loginUser(existingUser);
+    const token = this.loginUser(existingUser);
+
+    // Refresh token 저장
+    await this.userService.setCurrentRefreshToken(token.refreshToken, existingUser.idx);
+    return token;
   }
 }

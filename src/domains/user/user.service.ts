@@ -51,6 +51,8 @@ export class UserService {
 
   /**
    * Update Refresh Token for Login
+   * @param refreshToken: refreshToken
+   * @param userIdx: userIdx Key
    */
   async setCurrentRefreshToken(refreshToken: string, userIdx: number) {
     // Refresh Token을 Hashing
@@ -66,9 +68,13 @@ export class UserService {
 
   /**
    * Hashed with Refresh Token
+   * @param refreshToken: RefreshToken
    */
   async setHashedRefreshToken(refreshToken: string): Promise<string> {
-    const currentRefreshToken: string = await bcrypt.hash(refreshToken, this.configService.get<string>(ENV_HASH_ROUND));
+    const currentRefreshToken: string = await bcrypt.hash(
+      refreshToken,
+      Number(this.configService.get<string>(ENV_HASH_ROUND)),
+    );
     return currentRefreshToken;
   }
 
