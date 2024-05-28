@@ -19,7 +19,7 @@ export class AuthController {
     // access, refresh token이 포함되어 있는 리턴값
     const token = await this.authService.validateUser(user);
 
-    res.setHeader('Authorization', 'Bearer' + [token.accessToken]);
+    res.setHeader('authorization', 'Bearer' + [token.accessToken]);
     res.cookie('accessToken', token.accessToken, {
       httpOnly: true,
     });
@@ -34,4 +34,8 @@ export class AuthController {
       refreshToken: token.refreshToken,
     });
   }
+
+  /**
+   * Refresh Token을 사용한 AccessToken 재발급
+   */
 }

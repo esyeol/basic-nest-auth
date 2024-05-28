@@ -50,6 +50,18 @@ export class UserService {
   }
 
   /**
+   * User의 키를 조회
+   * @param userIdx: 유저의 Key
+   */
+  async getUserByIdx(userIdx: number) {
+    return this.userRepository.findOne({
+      where: {
+        idx: userIdx,
+      },
+    });
+  }
+
+  /**
    * Update Refresh Token for Login
    * @param refreshToken: refreshToken
    * @param userIdx: userIdx Key

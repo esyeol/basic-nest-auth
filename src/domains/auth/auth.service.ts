@@ -4,7 +4,12 @@ import { UserService } from '../user/user.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { ENV_HASH_ROUND, ENV_JWT_EXPOSE_ACCESS, ENV_JWT_EXPOSE_REFRESH } from '../common/const/env-keys.const';
+import {
+  ENV_HASH_ROUND,
+  ENV_JWT_EXPOSE_ACCESS,
+  ENV_JWT_EXPOSE_REFRESH,
+  ENV_JWT_SECRETE,
+} from '../common/const/env-keys.const';
 import { userDto } from '../user/dtos/user.dto';
 import { UserModel } from '../user/entities/user.entity';
 import { TokenType } from '../common/const/token-type.const';
@@ -16,7 +21,6 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly configService: ConfigService,
   ) {}
-
   /**
    * SignToken
    * access & refresh Token Sign 로직
@@ -100,5 +104,38 @@ export class AuthService {
     // Refresh token 저장
     await this.userService.setCurrentRefreshToken(token.refreshToken, existingUser.idx);
     return token;
+  }
+
+  /**
+   * Header로 부터 받아온 토큰값을 검증하고 추출하는 메서드
+   * @param header: header value
+   * Header의 토큰은 다음과 같이 들어옴 Bearer {Access} or Bearer {Refresh}
+   */
+  extractTokenFromHeader(header: string) {
+    // 띄어쓰기로 2배열로 분리 -> Bearer, Token
+    const splitToken = header.split(' ');
+    console.log('split Token ->', splitToken);
+    // splitToken으로 구분한 Token의 크기가 2가 아니거나 Bearer이 아닐경우 핸들링
+    if (splitToken.length !== 2 || splitToken[0] !== 'Bearer') {
+      throw new UnauthorizedException('Invalid Token');
+    }
+
+    // token을 추출
+    const token: string = splitToken[1];
+    return token;
+  }
+
+  /**
+   * 토큰 검증 및 토큰 정보를 반환
+   * @param token: Access & Refresh
+   */
+  verifyToken(token: string) {
+    try {
+      return this.jwtService.verify(token, {
+        secret: this.configService.get<string>(ENV_JWT_SECRETE),
+      });
+    } catch (error) {
+      throw new UnauthorizedException('토큰이 만료되었거나 잘못된 토큰 입니다.');
+    }
   }
 }
