@@ -138,4 +138,35 @@ export class AuthService {
       throw new UnauthorizedException('토큰이 만료되었거나 잘못된 토큰 입니다.');
     }
   }
+
+  /**
+   * 새로운 access 토큰 발급
+   */
+  async rotateAccessToken(token: string) {
+    // token 정보를 추출
+    const decoded = this.jwtService.verify(token, {
+      secret: this.configService.get<string>(ENV_JWT_SECRETE),
+    });
+    console.log('decoded ->', decoded);
+    // 위에서 디코딩한 토큰이 refresh가 아닐경우 에러 핸들링
+    if (decoded.type !== TokenType.REFRESH) {
+      throw new UnauthorizedException('Failed To Access Rotate Token');
+    }
+
+    // Access Token을 재발급 하기 위한 userInfo 추출
+    const userInfo: UserModel = await this.userService.getUserInfoWithRefreshAndUserIdx(token, decoded.userIdx);
+
+    // 유저의 정보가 없거나 refresh가 없을 때 401 핸들링
+    if (userInfo === null) {
+      throw new UnauthorizedException('Not Found Your Info OR RefreshToken');
+    }
+
+    // access Token 재발급을 하기위하기 때문에 signToken의 parameter를 false로 지정
+    return this.signToken(
+      {
+        ...userInfo,
+      },
+      false,
+    );
+  }
 }

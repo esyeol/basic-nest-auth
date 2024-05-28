@@ -1,7 +1,8 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Post, Res, UseGuards, Headers } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { userDto } from '../user/dtos/user.dto';
 import { Response } from 'express';
+import { RefreshTokenGuard } from './guard/bearer-token.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -36,6 +37,15 @@ export class AuthController {
   }
 
   /**
-   * Refresh Token을 사용한 AccessToken 재발급
+   * AccessToken 재발급 -> Refresh Token 기반 검증
    */
+  @Post('token/access')
+  @UseGuards(RefreshTokenGuard)
+  async postTokenRefresh(@Headers('authorization') rawToken: string) {
+    // refresh Token 조회
+    const token = this.authService.extractTokenFromHeader(rawToken);
+    console.log('token', token);
+    const newAccessToken = this.authService.rotateAccessToken(token);
+    return newAccessToken;
+  }
 }

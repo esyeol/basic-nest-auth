@@ -14,6 +14,7 @@ export class BearerTokenGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
     // req.headers -> Bearer+ 'accessToken' or 'refresh'
+    // console.log('req ->', req);
     const bearerToken = await req.headers['authorization'];
 
     // 토큰이 존재하지 않을 경우 401에러 반환
@@ -23,16 +24,18 @@ export class BearerTokenGuard implements CanActivate {
 
     // token 값을 추출
     const token: string = this.authService.extractTokenFromHeader(bearerToken);
-    console.log('token ->', token);
+    // console.log('token ->', token);
+
     // token 검증 및 정보 추출
     const result = await this.authService.verifyToken(token);
-    console.log('result ->', result);
-    const user = await this.userService.getUserByIdx(result.userIdx);
-    console.log('user ->', user);
+    // console.log('result ->', result);
 
-    req.token = token;
-    req.tokenType = result;
-    req.user = user;
+    const user = await this.userService.getUserByIdx(result.userIdx);
+    // console.log('user ->', user);
+
+    req.token = token; // 토큰 값 반환 access or refresh
+    req.tokenType = result.type; // 토큰 유형 반환 'access' | 'refresh'
+    req.user = user; // user info 반환
 
     return true;
   }
@@ -57,7 +60,7 @@ export class AccessTokenGuard extends BearerTokenGuard {
 
 /**Refresh Token Guard*/
 @Injectable()
-export class RefreshToken extends BearerTokenGuard {
+export class RefreshTokenGuard extends BearerTokenGuard {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     // BearerToken Guard의 절차를 모두 상속받아서 처리
     await super.canActivate(context);

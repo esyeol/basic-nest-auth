@@ -100,4 +100,29 @@ export class UserService {
     );
     return currentRefreshTokenExp;
   }
+
+  /**
+   * find by userinfo with refreshToken & userIdx
+   * @param refreshToken: refreshToken
+   * @param userIdx: userIdx
+   *  */
+  async getUserInfoWithRefreshAndUserIdx(refreshToken: string, userIdx: number): Promise<UserModel> {
+    const user: UserModel = await this.getUserByIdx(userIdx);
+    console.log('user ->', user);
+
+    // 유저의 refreshToken 조회 없으면 Null 리턴
+    if (!user.refreshToken) {
+      return null;
+    }
+
+    // 암호화된 refreshToken과 파라미터로 받은 refresh Token을 비교
+    const isRefreshTokenMatch = await bcrypt.compare(refreshToken, user.refreshToken);
+
+    // 두 정보가 일치할 경우 user 객체 리턴
+    if (isRefreshTokenMatch) {
+      return user;
+    } else {
+      return null;
+    }
+  }
 }
