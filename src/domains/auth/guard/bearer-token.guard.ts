@@ -13,7 +13,7 @@ export class BearerTokenGuard implements CanActivate {
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
-    // req.headers -> Bearer+ 'accessToken' or 'refresh'
+    // req.headers -> Bearer + 'accessToken' or 'refresh'
     // console.log('req ->', req);
     const bearerToken = await req.headers['authorization'];
 
@@ -70,6 +70,7 @@ export class RefreshTokenGuard extends BearerTokenGuard {
     if (req.tokenType !== TokenType.REFRESH) {
       throw new UnauthorizedException('Not Invalid Refresh Token');
     }
-    return true;
+    // return true;
+    return req;
   }
 }

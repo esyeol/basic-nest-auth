@@ -125,4 +125,15 @@ export class UserService {
       return null;
     }
   }
+
+  /**
+   * RemoveRefreshToken with Logout
+   * @param userIdx: number
+   */
+  async removeRefreshToken(userIdx: number) {
+    return this.userRepository.update(userIdx, {
+      refreshToken: null,
+      refreshTokenExp: null,
+    });
+  }
 }
