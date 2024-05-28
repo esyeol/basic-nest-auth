@@ -141,10 +141,11 @@ export class AuthService {
 
   /**
    * 새로운 access 토큰 발급
+   * @param refreshToken: Refresh Token
    */
-  async rotateAccessToken(token: string) {
+  async rotateAccessToken(refreshToken: string) {
     // token 정보를 추출
-    const decoded = this.jwtService.verify(token, {
+    const decoded = this.jwtService.verify(refreshToken, {
       secret: this.configService.get<string>(ENV_JWT_SECRETE),
     });
     console.log('decoded ->', decoded);
@@ -154,9 +155,9 @@ export class AuthService {
     }
 
     // Access Token을 재발급 하기 위한 userInfo 추출
-    const userInfo: UserModel = await this.userService.getUserInfoWithRefreshAndUserIdx(token, decoded.userIdx);
+    const userInfo: UserModel = await this.userService.getUserInfoWithRefreshAndUserIdx(refreshToken, decoded.userIdx);
 
-    // 유저의 정보가 없거나 refresh가 없을 때 401 핸들링
+    // 유저의 정보가 없거나 refresh가 없을 때, 핸들링
     if (userInfo === null) {
       throw new UnauthorizedException('Not Found Your Info OR RefreshToken');
     }

@@ -53,7 +53,7 @@ export class UserService {
    * User의 키를 조회
    * @param userIdx: 유저의 Key
    */
-  async getUserByIdx(userIdx: number) {
+  async getUserByIdx(userIdx: number): Promise<UserModel> {
     return this.userRepository.findOne({
       where: {
         idx: userIdx,
@@ -102,7 +102,7 @@ export class UserService {
   }
 
   /**
-   * find by userinfo with refreshToken & userIdx
+   * 유저의 RefreshToken 값과 userIdx 값을 기반으로 유저 정보 추출 메서드.
    * @param refreshToken: refreshToken
    * @param userIdx: userIdx
    *  */
@@ -116,13 +116,29 @@ export class UserService {
     }
 
     // 암호화된 refreshToken과 파라미터로 받은 refresh Token을 비교
-    const isRefreshTokenMatch = await bcrypt.compare(refreshToken, user.refreshToken);
+    // const isRefreshTokenMatch = await bcrypt.compare(refreshToken, user.refreshToken);
+    const isRefreshTokenMatch: boolean = await this.isRefreshTokenMatch(refreshToken, user.refreshToken);
 
     // 두 정보가 일치할 경우 user 객체 리턴
     if (isRefreshTokenMatch) {
       return user;
     } else {
       return null;
+    }
+  }
+
+  /**
+   * Refresh Token 일치 여부 조회
+   * @param getRefreshToken: 유저로 부터 전달된 검증 받기 위한 RefreshToken
+   * @param storedRefreshToken: 실제 저장된 RefreshToken
+   */
+  async isRefreshTokenMatch(getRefreshToken: string, storedRefreshToken: string): Promise<boolean> {
+    const isRefreshTokenMatch = await bcrypt.compare(getRefreshToken, storedRefreshToken);
+
+    if (isRefreshTokenMatch) {
+      return true;
+    } else {
+      return false;
     }
   }
 

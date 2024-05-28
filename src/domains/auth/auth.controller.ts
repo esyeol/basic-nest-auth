@@ -1,9 +1,10 @@
-import { Body, Controller, Post, Res, UseGuards, Headers, Req } from '@nestjs/common';
+import { Body, Controller, Post, Res, UseGuards, Headers, Req, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { userDto } from '../user/dtos/user.dto';
 import { Response } from 'express';
 import { RefreshTokenGuard } from './guard/bearer-token.guard';
 import { UserService } from '../user/user.service';
+import { UserModel } from '../user/entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -62,9 +63,9 @@ export class AuthController {
     // refreshToken 추출
     const token = this.authService.extractTokenFromHeader(rawToken);
     // payLoad 추출
-    const verifyInfo = this.authService.verifyToken(token);
+    const verifyPayLoad = this.authService.verifyToken(token);
 
-    await this.userService.removeRefreshToken(verifyInfo.userIdx);
+    await this.userService.removeRefreshToken(verifyPayLoad.userIdx);
     // await this.userService.removeRefreshToken(req.user.userIdx);
 
     // 쿠키 제거
@@ -72,5 +73,28 @@ export class AuthController {
     res.clearCookie('refreshToken');
 
     return res.json({ message: 'success logout' });
+  }
+
+  /** 서로다른 브라우저에서 로그인 했을 때, Refresh Token 검증을 위한 end-point */
+  @Post('/refresh-token/verify')
+  @UseGuards(RefreshTokenGuard)
+  async isVerifyRefreshToken(@Headers('authorization') rawToken: string, @Res() res: Response) {
+    // refresh Token 추출
+    const refreshToken = this.authService.extractTokenFromHeader(rawToken);
+    // payLoad 추출
+    const verifyPayLoad = this.authService.verifyToken(refreshToken);
+    // 유저 정보 추출
+    const user: UserModel = await this.userService.getUserByIdx(verifyPayLoad.userIdx);
+    // refresh 토큰 검증
+    const isVerifyUserWithRefreshToken: boolean = await this.userService.isRefreshTokenMatch(
+      refreshToken,
+      user.refreshToken,
+    );
+
+    if (isVerifyUserWithRefreshToken) {
+      return res.status(200).json({ message: 'ok' });
+    } else {
+      throw new UnauthorizedException('notValidateUser');
+    }
   }
 }
