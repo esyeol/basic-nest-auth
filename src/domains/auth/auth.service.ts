@@ -1,5 +1,5 @@
 import { Payload } from './../user/security/payload-interface';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -135,7 +135,12 @@ export class AuthService {
         secret: this.configService.get<string>(ENV_JWT_SECRETE),
       });
     } catch (error) {
-      throw new UnauthorizedException('토큰이 만료되었거나 잘못된 토큰 입니다.');
+      console.error('error', error.name);
+      if (error.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('RefreshToken Expired');
+      } else {
+        throw new ForbiddenException('Not Collected Token');
+      }
     }
   }
 

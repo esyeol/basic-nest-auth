@@ -48,12 +48,14 @@ export class AuthController {
     // refresh Token 조회
     const token = this.authService.extractTokenFromHeader(rawToken);
 
-    const newAccessToken = this.authService.rotateAccessToken(token);
-
+    const newAccessToken = await this.authService.rotateAccessToken(token);
+    console.log('newAccessToken ->', newAccessToken);
     // return newAccessToken;
-    return res.cookie('accessToken', newAccessToken, {
+    res.cookie('accessToken', newAccessToken, {
       httpOnly: true,
     });
+
+    res.json({ message: 'success' });
   }
 
   /**logout*/
