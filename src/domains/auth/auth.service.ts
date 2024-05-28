@@ -1,3 +1,4 @@
+import { Payload } from './../user/security/payload-interface';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { ConfigService } from '@nestjs/config';
@@ -6,7 +7,6 @@ import * as bcrypt from 'bcrypt';
 import { ENV_HASH_ROUND, ENV_JWT_EXPOSE_ACCESS, ENV_JWT_EXPOSE_REFRESH } from '../common/const/env-keys.const';
 import { userDto } from '../user/dtos/user.dto';
 import { UserModel } from '../user/entities/user.entity';
-import { Payload } from '../user/security/payload-interface';
 import { TokenType } from '../common/const/token-type.const';
 
 @Injectable()
@@ -33,9 +33,8 @@ export class AuthService {
       type: isRefreshToken ? TokenType.REFRESH : TokenType.ACCESS,
     };
 
-    console.log('payLoad ->', payLoad);
-
-    return this.jwtService.sign(payLoad, {
+    /** Refresh는 PayLoad의 userIdx 값만 payload로 저장 access는 payload를 저장  */
+    return this.jwtService.sign(isRefreshToken ? { userIdx: payLoad.userIdx, type: TokenType.REFRESH } : payLoad, {
       expiresIn: isRefreshToken
         ? this.configService.get<string>(ENV_JWT_EXPOSE_REFRESH)
         : this.configService.get<string>(ENV_JWT_EXPOSE_ACCESS),
@@ -84,7 +83,6 @@ export class AuthService {
    */
   loginUser(user: UserModel) {
     return {
-      message: 'success',
       accessToken: this.signToken(user, false),
       refreshToken: this.signToken(user, true),
     };
@@ -96,7 +94,6 @@ export class AuthService {
   async validateUser(authUser: Pick<userDto, 'userId' | 'password'>) {
     // id, pwd 기반 검증 확인
     const existingUser: UserModel = await this.authenticateWithIdAndPassword(authUser);
-    console.log('existingUser ->', existingUser);
     return this.loginUser(existingUser);
   }
 }

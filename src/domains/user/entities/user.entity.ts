@@ -64,8 +64,25 @@ export class UserModel extends BaseModel {
   })
   privacyAggrement: boolean;
 
+  @Column({
+    type: 'varchar',
+    length: 255,
+    comment: 'refresh Token',
+    nullable: true,
+    name: 'refresh_token',
+  })
+  refreshToken: string;
+
+  @Column({
+    type: 'datetime',
+    nullable: true,
+    comment: 'Refresh Token Expire Datetime',
+    name: 'refresh_token_exp',
+  })
+  refreshTokenExp: Date;
+
   @DeleteDateColumn({
-    type: 'timestamp',
+    type: 'datetime',
     name: 'deleted_at',
   })
   deletedAt: Date;

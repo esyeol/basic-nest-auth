@@ -4,11 +4,16 @@ import { UserModel } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { userDto } from './dtos/user.dto';
 
+import * as bcrypt from 'bcrypt';
+import { ConfigService } from '@nestjs/config';
+import { ENV_HASH_ROUND, ENV_JWT_EXPOSE_REFRESH } from '../common/const/env-keys.const';
+
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserModel)
     private readonly userRepository: Repository<UserModel>,
+    private readonly configService: ConfigService,
   ) {}
 
   /**
@@ -42,5 +47,39 @@ export class UserService {
         userId,
       },
     });
+  }
+
+  /**
+   * Update Refresh Token for Login
+   */
+  async setCurrentRefreshToken(refreshToken: string, userIdx: number) {
+    // Refresh Token을 Hashing
+    const hashedRefreshToken: string = await this.setHashedRefreshToken(refreshToken);
+    // Refresh Token의 EXP 시간을 datetime으로 변경
+    const currentRefreshTokenExp: Date = await this.getCurrentRefreshTokenExp();
+    // Refresh Token의 정보를 업데이트
+    await this.userRepository.update(userIdx, {
+      refreshToken: hashedRefreshToken,
+      refreshTokenExp: currentRefreshTokenExp,
+    });
+  }
+
+  /**
+   * Hashed with Refresh Token
+   */
+  async setHashedRefreshToken(refreshToken: string): Promise<string> {
+    const currentRefreshToken: string = await bcrypt.hash(refreshToken, this.configService.get<string>(ENV_HASH_ROUND));
+    return currentRefreshToken;
+  }
+
+  /**
+   * get Refresh Token Expired Time
+   */
+  async getCurrentRefreshTokenExp(): Promise<Date> {
+    const currentDate = new Date();
+    const currentRefreshTokenExp = new Date(
+      currentDate.getTime() + parseInt(this.configService.get<string>(ENV_JWT_EXPOSE_REFRESH)),
+    );
+    return currentRefreshTokenExp;
   }
 }
