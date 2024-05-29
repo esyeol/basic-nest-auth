@@ -1,5 +1,5 @@
 import { Payload } from './../user/security/payload-interface';
-import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -117,7 +117,7 @@ export class AuthService {
     console.log('split Token ->', splitToken);
     // splitToken으로 구분한 Token의 크기가 2가 아니거나 Bearer이 아닐경우 핸들링
     if (splitToken.length !== 2 || splitToken[0] !== 'Bearer') {
-      throw new UnauthorizedException('Invalid Token');
+      throw new BadRequestException('Invalid Bearer Token');
     }
 
     // token을 추출

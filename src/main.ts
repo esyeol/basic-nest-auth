@@ -8,6 +8,7 @@ import * as hpp from 'hpp';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api/v1');
   app.enableCors();
   app.use(hpp());
 

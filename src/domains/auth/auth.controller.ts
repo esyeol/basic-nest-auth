@@ -27,7 +27,7 @@ export class AuthController {
 
     res.setHeader('authorization', 'Bearer' + [token.accessToken]);
     res.cookie('accessToken', token.accessToken, {
-      httpOnly: true,
+      // httpOnly: true,
     });
 
     res.cookie('refreshToken', token.refreshToken, {
