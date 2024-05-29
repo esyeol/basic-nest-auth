@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res, UseGuards, Headers, Req, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, Post, Res, UseGuards, Headers, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { userDto } from '../user/dtos/user.dto';
 import { Response } from 'express';
@@ -68,7 +68,6 @@ export class AuthController {
     const verifyPayLoad = this.authService.verifyToken(token);
 
     await this.userService.removeRefreshToken(verifyPayLoad.userIdx);
-    // await this.userService.removeRefreshToken(req.user.userIdx);
 
     // 쿠키 제거
     res.clearCookie('accessToken');
