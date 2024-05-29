@@ -1,4 +1,4 @@
-## NestJS BoilerPlate 
+## Nest Auth Sample 
 
 - Yarn
 - Node 20.xx
